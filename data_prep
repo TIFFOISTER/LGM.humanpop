@@ -1,0 +1,91 @@
+setwd('~/SDM_practicals/Project')  
+  #load packages 
+library(sp) 
+library (maptools) 
+library(raster) 
+library(rgdal) 
+library (devtools) 
+library (sdm)   
+library (usdm)   
+library(ncdf4) 
+library(dismo) 
+
+# get occurrence data (arch data)  
+h.prescence <- read.csv("arch_data.csv")  
+h.occ <- h.prescence [,4:5] ## prescence data lats & longs
+
+# get predictors (climate)  
+##importing Beyer, Krapp & Manica clim data
+temperature <- stack("climate/LateQuaternary_Environment.nc", varname='temperature')
+precipitation <- stack("climate/LateQuaternary_Environment.nc", varname='precipitation')  
+cloudiness <- stack("climate/LateQuaternary_Environment.nc", varname='cloudiness')  
+relative_humidity <- stack("climate/LateQuaternary_Environment.nc", varname='relative_humidity')  
+wind_speed <- stack("climate/LateQuaternary_Environment.nc", varname='wind_speed')  
+min_temperature <- stack("climate/LateQuaternary_Environment.nc", varname='min_temperature')  
+max_temperature <- stack("climate/LateQuaternary_Environment.nc", varname='max_temperature')  
+biome <- stack("climate/LateQuaternary_Environment.nc", varname='biome')  
+npp <- stack("climate/LateQuaternary_Environment.nc", varname='npp')  
+lai <- stack("climate/LateQuaternary_Environment.nc", varname='lai')  
+BIO1 <- stack("climate/LateQuaternary_Environment.nc", varname='BIO1')  
+BIO4 <- stack("climate/LateQuaternary_Environment.nc", varname='BIO4')  
+BIO5 <- stack("climate/LateQuaternary_Environment.nc", varname='BIO5')  
+BIO6 <- stack("climate/LateQuaternary_Environment.nc", varname='BIO6')  
+BIO7 <- stack("climate/LateQuaternary_Environment.nc", varname='BIO7')  
+BIO8 <- stack("climate/LateQuaternary_Environment.nc", varname='BIO8')  
+BIO9 <- stack("climate/LateQuaternary_Environment.nc", varname='BIO9')
+BIO10 <- stack("climate/LateQuaternary_Environment.nc", varname='BIO10')
+BIO11 <- stack("climate/LateQuaternary_Environment.nc", varname='BIO11')
+BIO12 <- stack("climate/LateQuaternary_Environment.nc", varname='BIO12')
+BIO13 <- stack("climate/LateQuaternary_Environment.nc", varname='BIO13')
+BIO14 <- stack("climate/LateQuaternary_Environment.nc", varname='BIO14')
+BIO15 <- stack("climate/LateQuaternary_Environment.nc", varname='BIO15')
+BIO16 <- stack("climate/LateQuaternary_Environment.nc", varname='BIO16')
+BIO17 <- stack("climate/LateQuaternary_Environment.nc", varname='BIO17')
+BIO18 <- stack("climate/LateQuaternary_Environment.nc", varname='BIO18')
+BIO19 <- stack("climate/LateQuaternary_Environment.nc", varname='BIO19')
+## crop each layer to time frame 18999 - 24000  
+### time frame = 5 layers [[49]],[[50]],[[51]],[[52]],[[53]] 
+temperature <- raster::dropLayer(temperature,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+precipitation <- raster::dropLayer(precipitation,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+cloudiness <- raster::dropLayer(cloudiness,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+relative_humidity <- raster::dropLayer(relative_humidity,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72)) 
+wind_speed <- raster::dropLayer(wind_speed,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+min_temperature <- raster::dropLayer(min_temperature,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+max_temperature <- raster::dropLayer(max_temperature,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+biome <- raster::dropLayer(biome,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+npp <- raster::dropLayer(npp,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+lai <- raster::dropLayer(lai,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72)) 
+BIO1  <- raster::dropLayer(BIO1 ,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+BIO4 <- raster::dropLayer(BIO4,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+BIO5 <- raster::dropLayer(BIO5,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+BIO6 <- raster::dropLayer(BIO6,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+BIO7 <- raster::dropLayer(BIO7,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+BIO8 <- raster::dropLayer(BIO8,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+BIO9 <- raster::dropLayer(BIO9,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+BIO10 <- raster::dropLayer(BIO10,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+BIO11 <- raster::dropLayer(BIO11,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+BIO12 <- raster::dropLayer(BIO12,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+BIO13 <- raster::dropLayer(BIO13,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+BIO14 <- raster::dropLayer(BIO14,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72)) 
+BIO15 <- raster::dropLayer(BIO15,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72)) 
+BIO16 <- raster::dropLayer(BIO16,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72)) 
+BIO17 <- raster::dropLayer(BIO17,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72)) 
+BIO18 <- raster::dropLayer(BIO18,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))   
+BIO19 <- raster::dropLayer(BIO19,c (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72))  
+### put all layers into ONE STACK!! 
+allpredicts.stk <- stack(temperature, precipitation,cloudiness,relative_humidity,wind_speed, min_temperature, max_temperature, biome, npp, lai, BIO1, BIO4, BIO5, BIO6, BIO7, BIO8, BIO9, BIO10, BIO11, BIO12, BIO13, BIO14, BIO15, BIO16, BIO17, BIO18, BIO19)
+## crop to European extent  (longitude = -30 to 60, latitude = 34 to 72)
+europe <- extent(-30,60,34,72)  
+allpredicts <- raster::crop (allpredicts.stk, europe) 
+
+#prep occ data   
+##split presence data into test (30) & train (70)  
+### 443.1 = 70% h.occ  
+s <- sample(nrow(h.occ),443)
+train.occ<- h.occ[s,]
+test.occ <- h.occ[-s,]  
+
+##scrub unnecessary files from environment and save so can load without running all code. 
+save.image("~/SDM_practicals/Project/prepped_data.RData")
+
+
