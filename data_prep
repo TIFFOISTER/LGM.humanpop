@@ -78,7 +78,9 @@ allpredicts.stk <- stack(temperature, precipitation,cloudiness,relative_humidity
 europe <- extent(-30,60,34,72)  
 allpredicts <- raster::crop (allpredicts.stk, europe) 
 
-#prep occ data   
+#prep occ data      
+## make pseudo-abscences/background
+bg <- randomPoints(allpredicts, n= 1000, p= h.occ, ext = europe)
 ##split presence data into test (30) & train (70)  
 ### 443.1 = 70% h.occ  
 s <- sample(nrow(h.occ),443)
