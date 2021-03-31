@@ -11,19 +11,29 @@ library(ncdf4)
 library(dismo) 
 
 # get occurrence data (arch data)  
-h.prescence <- read.csv("arch_data.csv")  
+h.prescence <- read.csv("arch_data.csv")   
 h.occ <- h.prescence [,4:5] ## prescence data lats & longs
+h.occ$sp <- 1  
+## make pseudo-abscences/background
+bg <- randomPoints(allpredicts, n= 1000, p= h.occ, ext = europe) 
+bg<- as.data.frame.matrix(bg)
+bg$sp <- 0 
+colnames(bg)[colnames(bg) == "x"] = 'longitude' 
+colnames(bg)[colnames(bg) == "y"] = 'latitude'
+occ.data <- rbind(h.occ, bg)
 
 # get predictors (climate) --> see climate_prep  
 
 #prep occ data     
-## make pseudo-abscences/background
-bg <- randomPoints(allpredicts, n= 1000, p= h.occ, ext = europe)
-##split presence data into test (30) & train (70)  
-### 443.1 = 70% h.occ  
-s <- sample(nrow(h.occ),443)
-train.occ<- h.occ[s,]
-test.occ <- h.occ[-s,]  
+##split presence/abscence data into test (30) & train (70)  
+### 1143.1 = 70% h.occ  
+s <- sample(nrow(occ.data),1143)
+train.occ<- occ.data[s,]
+test.occ <- occ.data[-s,]   
+
+coords <- h.occ [,1:2] 
+coords.preds <- extract(predictors,coords)  
+occ.preds <- cbind (coords.preds, h.occ) 
 
 ##scrub unnecessary files from environment and save so can load without running all code. 
 save.image("~/SDM_practicals/Project/prepped_data.RData")
